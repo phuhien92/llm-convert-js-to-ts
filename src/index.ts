@@ -10,7 +10,7 @@ import crypto from "crypto";
 const client = new ChromaClient({ path: "http://localhost:8000" });
 
 const collection = await client.getOrCreateCollection({
-  name: "rag_tutorial_collection",
+  name: "llm-js-to-ts",
 });
 
 function generateContentHash(content) {
