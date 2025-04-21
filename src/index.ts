@@ -1,26 +1,17 @@
-import { ChromaClient } from "chromadb";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { generateText } from "ai";
 import { ollama } from "ollama-ai-provider";
 import { highlight } from "cli-highlight";
-import crypto from "crypto";
+import { collection, generateContentHash } from "./helpers/collection";
+import { program, getInput, closeReadline } from "./helpers/program";
 
-const client = new ChromaClient({ path: "http://localhost:8000" });
-
-const collection = await client.getOrCreateCollection({
-  name: "llm-js-to-ts",
-});
-
-function generateContentHash(content) {
-  return crypto.createHash("sha256").update(content, "utf8").digest("hex");
-}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const typesFilePath = path.join(__dirname, "example/types.d.ts");
+const typesFilePath = path.resolve(__dirname, "example/types.d.ts");
 const typesFile = await fs.readFile(typesFilePath, "utf8");
 const typesFileHash = generateContentHash(typesFile);
 
@@ -45,7 +36,6 @@ const results = await collection.query({
 });
 
 const searchDocs = results.documents[0].join("\n");
-
 const system = `
     You are a TypeScript developer. Convert this JavaScript code to TypeScript.
 
